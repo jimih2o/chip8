@@ -71,7 +71,7 @@ void platform::display::test_window(void)
     for (int i = 0; i < 60 && !glfwWindowShouldClose(window); ++i)
     {
         /* Render here */
-        //glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
