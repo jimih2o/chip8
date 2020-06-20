@@ -25,15 +25,20 @@
 #include <cstdint>
 #include <string>
 
-class debug
+namespace debug
 {
-    public:
-        static void enable(void);
-        static void disable(void);
+    class isanity_testable
+    {
+        public:
+            isanity_testable();
+            ~isanity_testable();
+            virtual void test_sanity(void) = 0;
+    };
 
-        static void trace(std::string const &message);
-
-    private:
-};
+    void enable(void);
+    void disable(void);
+    void test_sanity(void);
+    void trace(std::string const &message);
+}
 
 #endif//__DEBUG_H__

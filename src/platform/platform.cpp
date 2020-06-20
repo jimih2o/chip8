@@ -31,3 +31,7 @@ void platform::display::initialize(display_descriptor const &init)
     debug::trace("platform::display::initialize completed.");
 }
 
+void platform::display::test_sanity(void)
+{
+    debug::trace("platform::display::test_sanity completed.");
+}

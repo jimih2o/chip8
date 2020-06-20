@@ -23,13 +23,76 @@
 #include "platform.h"
 #include "debug.h"
 
+#include <iostream>
+#include <string>
+#include <cctype>
+#include <algorithm>
+
+namespace std {
+std::string& toupper(std::string &str) 
+{
+    std::transform(str.begin(), str.end(), str.begin(),
+        [](char c){return std::toupper(c);});
+    return str;
+}
+}
+
+static int parse_command_line(int argc, char **argv);
+
+struct
+{
+    bool runSanityTest = false;
+} s_config;
+
 int main(int argc, char **argv)
 {
+    int cmdLine = parse_command_line(argc - 1, &argv[1]);
+
     platform::display display;
 
-    debug::enable();
+    if (s_config.runSanityTest)
+    {
+        std::cout << "Begin Sanity Test\n";
+        debug::test_sanity();
+        std::cout << "Sanity Test Complete.\n";
+    }
+    else
+    {
+        display.initialize();
+    }
 
-    display.initialize();
+    return cmdLine;
+}
+
+static int parse_command_line(int argc, char **argv)
+{
+    if (argc < 1) return 0; // nothing to do
+
+    for (int i = 0; i < argc; ++i)
+    {
+        std::string opt(argv[i]);
+
+        // debug flag
+        if (opt == "d" ||
+            opt == "-d" ||
+            opt == "-D" ||
+            std::toupper(opt) == "-DEBUG")
+        {
+            debug::enable();
+        }
+        else if (opt == "s" ||
+                 opt == "-s" ||
+                 opt == "-S" ||
+                 std::toupper(opt) == "-SANITY")
+        {
+            debug::enable();
+            s_config.runSanityTest = true;
+        }
+        else
+        {
+            std::cout << "Unrecognized option: \"" << opt << "\"" << std::endl;
+        }
+    }
 
     return 0;
 }

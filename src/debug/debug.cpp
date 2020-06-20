@@ -23,8 +23,27 @@
 
 #include <atomic>
 #include <iostream>
+#include <list>
+#include <mutex>
+#include <algorithm>
 
 static std::atomic<bool> s_debugEnabled(false);
+static std::mutex s_sanityListMutex;
+static std::list<debug::isanity_testable*> s_sanityList;
+
+debug::isanity_testable::isanity_testable()
+{
+    s_sanityListMutex.lock();
+    s_sanityList.push_back(this);
+    s_sanityListMutex.unlock();
+}
+
+debug::isanity_testable::~isanity_testable()
+{
+    s_sanityListMutex.lock();
+    std::remove(s_sanityList.begin(), s_sanityList.end(), this);
+    s_sanityListMutex.unlock();
+}
 
 void debug::enable(void)
 {
@@ -41,5 +60,13 @@ void debug::trace(std::string const &message)
     if (s_debugEnabled)
     {
         std::cout << "tr>> " << message << std::endl;
+    }
+}
+
+void debug::test_sanity(void)
+{
+    for (auto object : s_sanityList)
+    {
+        object->test_sanity();
     }
 }

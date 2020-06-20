@@ -24,6 +24,8 @@
 
 #include <cstdint>
 
+#include "debug.h"
+
 namespace platform
 {
     int32_t const default_display_width  = 640;
@@ -35,11 +37,12 @@ namespace platform
         int32_t height = default_display_height;
     };
 
-    class display
+    class display : public debug::isanity_testable
     {
         public:
             void initialize(display_descriptor const &init = display_descriptor());
 
+            virtual void test_sanity(void);
         private:
             display_descriptor descriptor;
     };
