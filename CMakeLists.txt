@@ -1,5 +1,5 @@
+cmake_minimum_required( VERSION 3.13 )
 project( chip8 )
-cmake_minimum_required( VERSION 2.8 )
 
 include( CheckCXXCompilerFlag )
 check_cxx_compiler_flag( "-std=c++11"   COMPILER_SUPPORTS_CXX11 )
@@ -16,4 +16,5 @@ else()
     # MSVC, On by default (if available)
 endif()
 
-add_executable( ${PROJECT_NAME} main.cpp )
+add_executable( chip8 main.cpp )
+add_subdirectory(src)
