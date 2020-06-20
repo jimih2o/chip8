@@ -45,6 +45,8 @@ namespace platform
             virtual void test_sanity(void);
         private:
             display_descriptor descriptor;
+
+            void test_window(void);
     };
 }
 

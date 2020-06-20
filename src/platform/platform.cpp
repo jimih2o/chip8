@@ -22,6 +22,8 @@
 #include "platform.h"
 #include "debug.h"
 
+#include "glfw3.h"
+
 void platform::display::initialize(display_descriptor const &init)
 {
     descriptor = init;
@@ -33,5 +35,50 @@ void platform::display::initialize(display_descriptor const &init)
 
 void platform::display::test_sanity(void)
 {
+    debug::trace("platform::display::test_sanity begin");
+
+    debug::trace("platform::display::test_sanity::test_window begin");
+    test_window();
+    debug::trace("platform::display::test_sanity::test_window completed.");
+
     debug::trace("platform::display::test_sanity completed.");
+}
+
+void platform::display::test_window(void)
+{
+    GLFWwindow* window;
+
+    /* Initialize the library */
+    if (!glfwInit())
+    {
+        debug::trace("test_window -- glfwInit failed!");
+        return;
+    }
+
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        debug::trace("test_window -- glfwCreateWindow failed!");
+        return;
+    }
+
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+
+    /* Loop until the user closes the window */
+    for (int i = 0; i < 60 && !glfwWindowShouldClose(window); ++i)
+    {
+        /* Render here */
+        //glClear(GL_COLOR_BUFFER_BIT);
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
 }
