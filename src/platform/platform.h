@@ -22,9 +22,27 @@
 #ifndef __PLATFORM_H__
 #define __PLATFORM_H__
 
+#include <cstdint>
+
 namespace platform
 {
-    void test_print(void);
+    int32_t const default_display_width  = 640;
+    int32_t const default_display_height = 480;
+
+    struct display_descriptor
+    {
+        int32_t width  = default_display_width;
+        int32_t height = default_display_height;
+    };
+
+    class display
+    {
+        public:
+            void initialize(display_descriptor const &init = display_descriptor());
+
+        private:
+            display_descriptor descriptor;
+    };
 }
 
 #endif//__PLATFORM_H__

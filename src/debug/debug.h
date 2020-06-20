@@ -19,15 +19,21 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#include "platform.h"
-#include "debug.h"
+#ifndef __DEBUG_H__
+#define __DEBUG_H__
 
-void platform::display::initialize(display_descriptor const &init)
+#include <cstdint>
+#include <string>
+
+class debug
 {
-    descriptor = init;
+    public:
+        static void enable(void);
+        static void disable(void);
 
-    // todo validate descriptor
+        static void trace(std::string const &message);
 
-    debug::trace("platform::display::initialize completed.");
-}
+    private:
+};
 
+#endif//__DEBUG_H__

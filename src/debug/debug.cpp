@@ -19,15 +19,27 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#include "platform.h"
 #include "debug.h"
 
-void platform::display::initialize(display_descriptor const &init)
+#include <atomic>
+#include <iostream>
+
+static std::atomic<bool> s_debugEnabled(false);
+
+void debug::enable(void)
 {
-    descriptor = init;
-
-    // todo validate descriptor
-
-    debug::trace("platform::display::initialize completed.");
+    s_debugEnabled = true;
 }
 
+void debug::disable(void)
+{
+    s_debugEnabled = false;
+}
+
+void debug::trace(std::string const &message)
+{
+    if (s_debugEnabled)
+    {
+        std::cout << "tr>> " << message << std::endl;
+    }
+}

@@ -21,10 +21,15 @@
 // SOFTWARE.
 
 #include "platform.h"
+#include "debug.h"
 
 int main(int argc, char **argv)
 {
-    platform::test_print();
+    platform::display display;
+
+    debug::enable();
+
+    display.initialize();
 
     return 0;
 }
