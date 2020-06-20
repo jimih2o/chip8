@@ -19,12 +19,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+#ifndef __PLATFORM_H__
+#define __PLATFORM_H__
 
-#include "platform.h"
-
-int main(int argc, char **argv)
+namespace platform
 {
-    platform::test_print();
-
-    return 0;
+    void test_print(void);
 }
+
+#endif//__PLATFORM_H__
