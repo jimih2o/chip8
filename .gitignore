@@ -1,3 +1,14 @@
+# build outputs-- project specific
+chip8
+
+# Cmake
+Cmake/
+CMakeFiles
+CMakeFiles/*
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
 # Prerequisites
 *.d
 
