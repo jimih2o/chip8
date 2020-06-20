@@ -16,7 +16,7 @@ jobs:
     - name: submodules
       run: git submodule init && git submodule update --recursive
     - name: dependencies
-      run: sudo apt install libxrandr
+      run: sudo apt install xorg-dev libsoundio-dev -y
     - name: configure
       run: ./configure
     - name: make
