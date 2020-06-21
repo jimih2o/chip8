@@ -28,9 +28,98 @@ void platform::display::initialize(display_descriptor const &init)
 {
     descriptor = init;
 
-    // todo validate descriptor
+    static bool s_initOnce = false;
+
+    if (s_initOnce == false)
+    {
+        if (!glfwInit())
+        {
+            debug::trace("platform::display::initialize glfwInit() failed!");
+            return;
+        }
+
+        s_initOnce = true;
+    }
+
+    windowHandle = static_cast<void*>(glfwCreateWindow(init.pixel_width(), 
+                                                       init.pixel_height(), 
+                                                       init.title.c_str(), 
+                                                       NULL, 
+                                                       NULL));
+    if (windowHandle == nullptr)
+    {
+        glfwTerminate();
+        debug::trace("platform::display::initialize glfwCreateWindow() failed!");
+        return;
+    }
+
+    glfwMakeContextCurrent(static_cast<GLFWwindow*>(windowHandle));
+
+    pixelBuffer.clear();
+    pixelBuffer.resize(init.width); // pixelBuffer[x][y]
+    for (auto& row : pixelBuffer) // for each row, add a column
+        row.resize(init.height, (rand() % 2) == 0 ? // randomly color each column
+                                    init.bg_color : init.fg_color);
 
     debug::trace("platform::display::initialize completed.");
+}
+
+bool platform::display::ui_close(void) 
+{
+    return glfwWindowShouldClose(static_cast<GLFWwindow *>(windowHandle));
+}
+
+void platform::display::update(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    glViewport(0, 0, descriptor.pixel_width(), descriptor.pixel_height());
+    
+    uint8_t *pixelData = new uint8_t[descriptor.pixel_width() * descriptor.pixel_height()];
+
+    for (int x = 0; x < descriptor.pixel_width(); ++x)
+    {
+        for (int y = 0; y < descriptor.pixel_height(); ++y)
+        {
+            pixelData[x + y * descriptor.pixel_width()] = pixelBuffer[x / descriptor.pixel_size][y / descriptor.pixel_size];
+        }
+    }
+
+    glDrawPixels(descriptor.pixel_width(),
+                 descriptor.pixel_height(),
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE_3_3_2,
+                 pixelData);
+    
+    delete[] pixelData;
+
+    glfwSwapBuffers(static_cast<GLFWwindow*>(windowHandle));
+
+    glfwPollEvents();
+}
+
+void platform::display::set_pixel(int32_t x, int32_t y)
+{
+    pixel(x, y, descriptor.fg_color);
+}
+
+void platform::display::clear_pixel(int32_t x, int32_t y)
+{
+    pixel(x, y, descriptor.bg_color);
+}
+
+void platform::display::pixel(int32_t x, int32_t y, uint8_t rgb)
+{
+    pixelBuffer[x][y] = rgb;
+}
+
+void platform::display::clear_screen(void)
+{
+    for (int x = 0; x < descriptor.width; ++x)
+        for (int y = 0; y < descriptor.height; ++y)
+            pixelBuffer[x][y] = descriptor.bg_color;
 }
 
 void platform::display::test_sanity(void)
@@ -71,7 +160,7 @@ void platform::display::test_window(void)
     for (int i = 0; i < 60 && !glfwWindowShouldClose(window); ++i)
     {
         /* Render here */
-        //glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

@@ -14,4 +14,4 @@ target_sources(chip8
 )
 
 add_subdirectory(lib/glfw)
-target_link_libraries(chip8 PRIVATE glfw)
+target_link_libraries(chip8 PRIVATE glfw GL)

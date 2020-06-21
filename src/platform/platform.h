@@ -23,28 +23,52 @@
 #define __PLATFORM_H__
 
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include "debug.h"
 
 namespace platform
 {
-    int32_t const default_display_width  = 640;
-    int32_t const default_display_height = 480;
+    int32_t const     default_pixel_size     = 10;
+    int32_t const     default_display_width  = 64;
+    int32_t const     default_display_height = 48;
+    std::string const default_display_title  = "Chip-8";
+    uint8_t const     default_bg_color       = 0; // 3 3 2 format
+    uint8_t const     default_fg_color       = 255;
+
 
     struct display_descriptor
     {
-        int32_t width  = default_display_width;
-        int32_t height = default_display_height;
+        int32_t pixel_size = default_pixel_size;
+        int32_t width      = default_display_width;
+        int32_t height     = default_display_height;
+        std::string title  = default_display_title;
+        float bg_color     = default_bg_color;
+        float fg_color     = default_fg_color;
+
+        int32_t pixel_width() const {return width * pixel_size;}
+        int32_t pixel_height() const{return height* pixel_size;}
     };
 
     class display : public debug::isanity_testable
     {
         public:
             void initialize(display_descriptor const &init = display_descriptor());
+            void display_splash(void);
+            bool ui_close(void);
+            void update(void);
+
+            void set_pixel(int32_t x, int32_t y);
+            void clear_pixel(int32_t x, int32_t y);
+            void pixel(int32_t x, int32_t y, uint8_t rgb);
+            void clear_screen(void);
 
             virtual void test_sanity(void);
         private:
-            display_descriptor descriptor;
+            display_descriptor                descriptor;
+            void                             *windowHandle;
+            std::vector<std::vector<uint8_t>> pixelBuffer;
 
             void test_window(void);
     };
