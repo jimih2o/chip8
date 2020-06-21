@@ -59,6 +59,11 @@ int main(int argc, char **argv)
     else
     {
         display.initialize();
+
+        while (display.ui_close() == false)
+        {
+            display.update();
+        }
     }
 
     return cmdLine;
