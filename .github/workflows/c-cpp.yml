@@ -16,7 +16,7 @@ jobs:
     - name: submodules
       run: git submodule init && git submodule update --recursive
     - name: dependencies
-      run: sudo apt install xorg-dev libsoundio-dev libgl1-mesa-glx fglrx fglrx-updates -y
+      run: sudo apt install xorg-dev libsoundio-dev libgl1-mesa-glx libgl1-mesa-dev -y
     - name: configure
       run: ./configure
     - name: make
