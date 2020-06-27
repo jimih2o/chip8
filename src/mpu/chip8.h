@@ -53,9 +53,9 @@ namespace mpu
     class chip8
     {
         public:
-            const uint32_t memory_size = 4096u;
-            const uint32_t stack_depth = 16;
-            const enum reg
+            const static uint32_t memory_size = 4096u;
+            const static uint32_t stack_depth = 16;
+            enum reg
             {
                 v0 = 0,
                 v1,v2,v3,v4,v5,v6,v7,v8,v9,

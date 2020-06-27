@@ -84,7 +84,7 @@ void mpu::chip8::clock(void)
                     if (sp == 0)
                     {
                         debug::trace("!!!chip8::clock (call) stack underflow!!!");
-                        harfault();
+                        hardfault();
                         return;
                     }
 
@@ -120,6 +120,7 @@ void mpu::chip8::clock(void)
             break;
 
         case 0x3000:
+        {
             // skip over instruction if Vx == NN
             // 0x3XNN
             uint16_t regIndex = (op & 0x0F00) >> 8u;
@@ -127,9 +128,10 @@ void mpu::chip8::clock(void)
             {
                 pc += 2u; // skip over 1 instruction size
             }
-            break;
+        }break;
 
         case 0x4000:
+        {
             // skip over if Vx != NN
             // 0x4xNN
             uint16_t regIndex = (op & 0x0F00) >> 8u;
@@ -137,9 +139,10 @@ void mpu::chip8::clock(void)
             {
                 pc += 2u; // skip over 1 instruction size
             }
-            break;
+        } break;
 
         case 0x5000:
+        {
             // 0x5XY0
             // skip over if Vx == Vy
             uint16_t x = (op & 0x0F00) >> 8u;
@@ -149,7 +152,7 @@ void mpu::chip8::clock(void)
             {
                 // bad instruction!
                 debug::trace("!!!chip8::clock bad instruction 0x5nnX!!!");
-                hadfault();
+                hardfault();
                 return;
             }
 
@@ -157,35 +160,210 @@ void mpu::chip8::clock(void)
             {
                 pc += 2u; // skip over 1 instruction size
             }
-            break;
+        } break;
 
         case 0x6000:
+        {
             // set (0x6XNN) Vx to NN
             uint16_t x = (op & 0x0F00) >> 8u;
             uint16_t NN = (op & 0x00FF);
 
             v[x] = NN;
-            break;
+        } break;
 
         case 0x7000:
-            break;
+        {
+            // 0x7XNN
+            // Vx += NN
+            uint16_t x = (op & 0x0F00) >> 8u;
+            uint16_t NN = (op & 0x00FF);
+            
+            v[x] += NN;
+        } break;
 
         case 0x8000:
-            break;
+        {
+            // 0x8 XY N
+            uint16_t x = (op & 0x0F00) >> 8;
+            uint16_t y = (op & 0x00F0) >> 4;
+            switch (op & 0x000F)//N
+            {
+                case 0://==N
+                    v[x] = v[y];
+                    break;
+
+                case 1://==N
+                    v[x] |= v[y];
+                    break;
+
+                case 2://==N
+                    v[x] &= v[y];
+                    break;
+
+                case 3://==N
+                    v[x] ^= v[y];
+                    break;
+
+                case 4://==N
+                {
+                    uint16_t result = v[x] + v[y];
+                    v[vF] = (result > 0xFF);
+                    v[x] = result & 0xFF;
+                } break;
+
+                case 5://==N
+                    v[vF] = (v[x] > v[y]);
+                    v[x] -= v[y];
+                    break;
+
+                case 6://==N
+                    v[vF] = v[x] & 0x1;
+                    v[x] >>= 1;
+                    break;
+
+                case 7://==N
+                    v[vF] = (v[y] > v[x]);
+                    v[x] = v[y] - v[x];
+                    break;
+
+                case 0xE://==N
+                    v[vF] = (v[x] & 0x80) >> 7u;
+                    v[x] <<= 1;
+                    break;
+
+                default:
+                    debug::trace("!!!chip8::clock badly formed instruction about M: 0x8xxM!!!");
+                    hardfault();
+                    return;
+            }
+        } break;
 
         case 0x9000:
-            break;
+        {
+            // 0x9xy0
+            if (op & 0xF)
+            {
+                debug::trace("!!!chip8::clock badly formed instruction about M: 0x9xxM!!!");
+            }
+
+            uint16_t x = (op & 0x0F00) >> 8;
+            uint16_t y = (op & 0x00F0) >> 4;
+
+            if (v[x] == v[y])
+            {
+                pc += 2; // skip next instruction
+            }
+        } break;
+
         case 0xA000:
+            i = op & 0x0FFF;
             break;
+
         case 0xB000:
+            pc = v[v0] + (op & 0x0FFF);
             break;
+
         case 0xC000:
-            break;
+        {
+            uint16_t x  = (op & 0x0F00) >> 8;
+            uint16_t NN = op & 0x00FF;
+            v[x] = (rand() & NN);
+        } break;
+
         case 0xD000:
+            // 0xDxyN
+            // draw(vx, vy, N)
             break;
+
         case 0xE000:
+            if ((op & 0xF0FF) == 0xE09E)
+            {
+                uint16_t x = (op & 0x0F00) >> 8;
+                // if key( v[x] ) is pressed, skip
+            }
+            else if ((op & 0xF0FF) == 0xE0A1)
+            {
+                uint16_t x = (op & 0x0F00) >> 8;
+                // if key( v[x] ) is released, skip
+            }
+            else
+            {
+                debug::trace("!!!chip8::clock bad instruction!!!");
+                hardfault();
+            }
             break;
+
         case 0xF000:
+        {
+            uint16_t x = (op & 0x0F00) >> 8;
+            switch (op & 0xF0FF)
+            {
+                case 0xF007:
+                    // Vx = get_delay()
+                    break;
+
+                case 0xF00A:
+                    // Vx = get_key() (blocking)
+                    break;
+
+                case 0xF015:
+                    // delay_timer(Vx)
+                    break;
+
+                case 0xF018:
+                    // sound_timer(Vx)
+                    break;
+
+                case 0xF01E:
+                    // I += Vx
+                    i += v[x];
+                    break;
+
+                case 0xF029:
+                    // I = sprite_addr[Vx]
+                    break;
+
+                case 0xF033:
+                    // set_bcd(Vx)
+                    // I[0] = BCD(3); MSB (100s) 
+                    // I[1] = BCD(2);     (10s)
+                    // I[2] = BCD(1); LSB (1s)
+                    // take BCD rep of Vx, place into I[...]
+                    mem[i] = v[x] / 100;
+                    mem[i + 1] = (v[x] - mem[i]) / 10;
+                    mem[i + 2] = v[x] - mem[i + 1]*10 - mem[i]*100;
+                    break;
+
+                case 0xF055:
+                    // reg_dump(V[0:x] -> I) 
+                    // otherwise known as push registers to location in I (I is not modified)
+                    for (uint32_t j = 0; j < x; ++j)
+                    {
+                        mem[i + j] = v[j];
+                    }
+                    break;
+
+                case 0xF065:
+                    // reg_load(I -> V[0:x])
+                    // otherwise known as pop registers from location in I (I is not modified)
+                    for (uint32_t j = 0; j < x; ++j)
+                    {
+                        v[j] = mem[i + j];
+                    }
+                    break;
+
+                default:
+                    debug::trace("!!!chip8::clock bad instruction around 0xFxMM!!!");
+                    hardfault();
+                    return;
+                    break;
+            }
+        } break;
+
+        default:
+            debug::trace("!!!chip8::clock bad instruction!!!");
+            hardfault();
+            return;
             break;
     }
 

@@ -52,7 +52,7 @@ namespace platform
         int32_t pixel_height() const{return height* pixel_size;}
     };
 
-    class display : public debug::isanity_testable, public display_hook
+    class display : public debug::isanity_testable, public mpu::display_hook
     {
         public:
             void initialize(display_descriptor const &init = display_descriptor());
