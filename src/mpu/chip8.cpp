@@ -337,6 +337,13 @@ void mpu::chip8::clock(void)
                 case 0xF055:
                     // reg_dump(V[0:x] -> I) 
                     // otherwise known as push registers to location in I (I is not modified)
+                    if (i + x > 0xFFF)
+                    {
+                        debug::trace("!!!chip8::clock overflow in I at 0xFx55!!!");
+                        hardfault();
+                        return;
+                    }
+
                     for (uint32_t j = 0; j < x; ++j)
                     {
                         mem[i + j] = v[j];
@@ -346,6 +353,13 @@ void mpu::chip8::clock(void)
                 case 0xF065:
                     // reg_load(I -> V[0:x])
                     // otherwise known as pop registers from location in I (I is not modified)
+                    if (i + x > 0xFFF)
+                    {
+                        debug::trace("!!!chip8::clock overflow in I at 0xFx65!!!");
+                        hardfault();
+                        return;
+                    }
+
                     for (uint32_t j = 0; j < x; ++j)
                     {
                         v[j] = mem[i + j];
