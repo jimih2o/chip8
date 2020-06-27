@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "debug.h"
+#include "chip8.h"
 
 namespace platform
 {
@@ -51,7 +52,7 @@ namespace platform
         int32_t pixel_height() const{return height* pixel_size;}
     };
 
-    class display : public debug::isanity_testable
+    class display : public debug::isanity_testable, public mpu::display_hook
     {
         public:
             void initialize(display_descriptor const &init = display_descriptor());
@@ -62,8 +63,8 @@ namespace platform
             void set_pixel(int32_t x, int32_t y);
             void clear_pixel(int32_t x, int32_t y);
             void pixel(int32_t x, int32_t y, uint8_t rgb);
-            void clear_screen(void);
-
+            
+            virtual void clear_screen(void);
             virtual void test_sanity(void);
         private:
             display_descriptor                descriptor;
