@@ -24,7 +24,7 @@
 
 #include "glfw3.h"
 
-void platform::display::initialize(display_descriptor const &init)
+void platform::platform::initialize(display_descriptor const &init)
 {
     descriptor = init;
 
@@ -34,7 +34,7 @@ void platform::display::initialize(display_descriptor const &init)
     {
         if (!glfwInit())
         {
-            debug::trace("platform::display::initialize glfwInit() failed!");
+            debug::trace("platform::initialize glfwInit() failed!");
             return;
         }
 
@@ -49,7 +49,7 @@ void platform::display::initialize(display_descriptor const &init)
     if (windowHandle == nullptr)
     {
         glfwTerminate();
-        debug::trace("platform::display::initialize glfwCreateWindow() failed!");
+        debug::trace("platform::initialize glfwCreateWindow() failed!");
         return;
     }
 
@@ -58,18 +58,23 @@ void platform::display::initialize(display_descriptor const &init)
     pixelBuffer.clear();
     pixelBuffer.resize(init.width); // pixelBuffer[x][y]
     for (auto& row : pixelBuffer) // for each row, add a column
-        row.resize(init.height, (rand() % 2) == 0 ? // randomly color each column
-                                    init.bg_color : init.fg_color);
+        row.resize(init.height);
 
-    debug::trace("platform::display::initialize completed.");
+    // initialize to noise
+    for (int i = 0; i < init.width; ++i)
+        for (int j = 0; j < init.height; ++j)
+            pixelBuffer[i][j] = (rand() % 2) == 0 ?
+                                    init.bg_color : init.fg_color;
+
+    debug::trace("platform::initialize completed.");
 }
 
-bool platform::display::ui_close(void) 
+bool platform::platform::ui_close(void) 
 {
     return glfwWindowShouldClose(static_cast<GLFWwindow *>(windowHandle));
 }
 
-void platform::display::update(void)
+void platform::platform::update(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -100,40 +105,40 @@ void platform::display::update(void)
     glfwPollEvents();
 }
 
-void platform::display::set_pixel(int32_t x, int32_t y)
+void platform::platform::set_pixel(int32_t x, int32_t y)
 {
     pixel(x, y, descriptor.fg_color);
 }
 
-void platform::display::clear_pixel(int32_t x, int32_t y)
+void platform::platform::clear_pixel(int32_t x, int32_t y)
 {
     pixel(x, y, descriptor.bg_color);
 }
 
-void platform::display::pixel(int32_t x, int32_t y, uint8_t rgb)
+void platform::platform::pixel(int32_t x, int32_t y, uint8_t rgb)
 {
     pixelBuffer[x][y] = rgb;
 }
 
-void platform::display::clear_screen(void)
+void platform::platform::clear_screen(void)
 {
     for (int x = 0; x < descriptor.width; ++x)
         for (int y = 0; y < descriptor.height; ++y)
             pixelBuffer[x][y] = descriptor.bg_color;
 }
 
-void platform::display::test_sanity(void)
+void platform::platform::test_sanity(void)
 {
-    debug::trace("platform::display::test_sanity begin");
+    debug::trace("platform::test_sanity begin");
 
-    debug::trace("platform::display::test_sanity::test_window begin");
+    debug::trace("platform::test_sanity::test_window begin");
     test_window();
-    debug::trace("platform::display::test_sanity::test_window completed.");
+    debug::trace("platform::test_sanity::test_window completed.");
 
-    debug::trace("platform::display::test_sanity completed.");
+    debug::trace("platform::test_sanity completed.");
 }
 
-void platform::display::test_window(void)
+void platform::platform::test_window(void)
 {
     GLFWwindow* window;
 

@@ -56,6 +56,46 @@ void mpu::chip8::hardfault(void)
     i = 0;
     sp = 0;
 }
+void mpu::chip8::test_sanity(void)
+{
+    // load test program to memory
+    uint8_t prog[] = {
+        0x00,0x00, // 0x0000: NOP
+        0x00,0x00, // 0x0002: NOP
+        0x60,0xFF, // 0x0004: V0 := FF
+        0x61,0x01, // 0x0006: V1 := 01
+        0x80,0x15, // 0x0008: V0 -= V1
+        0x30,0x00, // 0x000A: skip if V0 == 00
+        0x10,0x08, // 0x000C: branch to 0x008
+        0x00,0x00, // 0x000E: NOP
+        0x00,0x00, // 0x0010: NOP
+        0x00,0x00, // 0x0012: NOP
+    };
+
+    debug::trace("chip8::test_sanity begin");
+
+    // reset chip context
+    init();
+
+    debug::trace("chip8::test_sanity loading program to memory");
+    
+    // load program to memory
+    memcpy(mem, prog, sizeof(prog));
+
+    // give it 1000 "clock cycles" to complete to 0x0012
+    for (uint32_t c = 0; c < 1000; ++c)
+    {
+        clock();
+
+        if (pc == 0x0012)
+            break;
+    }
+
+    if (pc != 0x0012)
+        debug::trace("!!!chip8::teset_sanity failed -- pc==" +std::to_string(pc)+ "!!!");
+    
+    debug::trace("chip8::test_sanity completed.");
+}
 
 void mpu::chip8::clock(void)
 {

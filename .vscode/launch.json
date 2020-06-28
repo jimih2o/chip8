@@ -9,7 +9,9 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${workspaceFolder}/build/chip8",
-        "args": [],
+        "args": [
+            "-s"
+        ],
         "stopAtEntry": true,
         "cwd": "${workspaceFolder}",
         "environment": [],
@@ -22,7 +24,8 @@
                 "ignoreFailures": true
             }
         ],
-      "miDebuggerPath": "/usr/bin/gdb"
+      "miDebuggerPath": "/usr/bin/gdb",
+      "preLaunchTask": "build",
     },
     ]
 }

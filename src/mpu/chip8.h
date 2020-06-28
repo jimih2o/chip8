@@ -24,6 +24,8 @@
 
 #include <cstdint>
 
+#include "debug.h"
+
 namespace mpu
 {
     struct display_hook
@@ -50,7 +52,7 @@ namespace mpu
         input_hook* pInput;
     };
 
-    class chip8
+    class chip8 : public debug::isanity_testable
     {
         public:
             const static uint32_t memory_size = 4096u;
@@ -69,6 +71,8 @@ namespace mpu
             void init(void);
             void clock(void);
             void hardfault(void);
+
+            virtual void test_sanity(void);
 
         private:
             uint8_t  mem[memory_size];

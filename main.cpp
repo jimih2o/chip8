@@ -48,7 +48,13 @@ int main(int argc, char **argv)
 {
     int cmdLine = parse_command_line(argc - 1, &argv[1]);
 
-    platform::display display;
+    platform::platform platform;
+    
+    mpu::hardware_hooks hooks = 
+    {
+        .pDisplay = &platform,
+    };
+    mpu::chip8 chip8(hooks);
 
     if (s_config.runSanityTest)
     {
@@ -58,11 +64,11 @@ int main(int argc, char **argv)
     }
     else
     {
-        display.initialize();
+        platform.initialize();
 
-        while (display.ui_close() == false)
+        while (platform.ui_close() == false)
         {
-            display.update();
+            platform.update();
         }
     }
 
